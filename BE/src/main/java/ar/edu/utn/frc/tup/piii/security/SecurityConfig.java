@@ -33,16 +33,17 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/users/register", "/api/users/login").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/ws/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/cards/**").permitAll()
-                .requestMatchers("/uploads/**").permitAll()
-                .anyRequest().authenticated()
-            )
+.authorizeHttpRequests(auth -> auth
+    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+    .requestMatchers("/", "/error").permitAll()
+    .requestMatchers("/api/users/register", "/api/users/login").permitAll()
+    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+    .requestMatchers("/h2-console/**").permitAll()
+    .requestMatchers("/ws/**").permitAll()
+    .requestMatchers(HttpMethod.GET, "/api/cards/**").permitAll()
+    .requestMatchers("/uploads/**").permitAll()
+    .anyRequest().authenticated()
+)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
