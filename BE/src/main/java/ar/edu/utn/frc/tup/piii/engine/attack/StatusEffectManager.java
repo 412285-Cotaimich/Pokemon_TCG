@@ -11,6 +11,7 @@ import ar.edu.utn.frc.tup.piii.engine.model.PlayerState;
 import ar.edu.utn.frc.tup.piii.engine.model.PokemonInPlay;
 import ar.edu.utn.frc.tup.piii.engine.ports.CardLookupPort;
 import ar.edu.utn.frc.tup.piii.engine.EngineContext;
+import ar.edu.utn.frc.tup.piii.engine.handlers.TakePrizeCardHandler;
 import ar.edu.utn.frc.tup.piii.engine.ports.RandomizerPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,8 +201,8 @@ public class StatusEffectManager {
         }
 
         if (opponent != null) {
-            state.setPendingPrizeOwnerPlayerId(opponent.getPlayerId());
-            state.setPendingPrizeCount(state.getPendingPrizeCount() + (pkmDef.isEx() ? 2 : 1));
+            int prizeValue = pkmDef.isEx() ? 2 : 1;
+            TakePrizeCardHandler.takePrizeImmediate(ctx, opponent, prizeValue);
         }
 
         events.add(new GameEvent(

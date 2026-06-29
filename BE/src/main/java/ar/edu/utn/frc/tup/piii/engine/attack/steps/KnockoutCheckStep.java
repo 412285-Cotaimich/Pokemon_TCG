@@ -9,6 +9,7 @@ import ar.edu.utn.frc.tup.piii.engine.attack.AbstractAttackStep;
 import ar.edu.utn.frc.tup.piii.engine.attack.AttackContext;
 import ar.edu.utn.frc.tup.piii.engine.event.GameEvent;
 import ar.edu.utn.frc.tup.piii.engine.event.GameEventType;
+import ar.edu.utn.frc.tup.piii.engine.handlers.TakePrizeCardHandler;
 import ar.edu.utn.frc.tup.piii.engine.model.CardInstance;
 import ar.edu.utn.frc.tup.piii.engine.model.GameState;
 import ar.edu.utn.frc.tup.piii.engine.model.PlayerState;
@@ -65,6 +66,14 @@ public class KnockoutCheckStep extends AbstractAttackStep {
             var owner = ctx.getPlayer(pokemon.getOwnerPlayerId());
             var prizeRecipient = ctx.getOpponent(pokemon.getOwnerPlayerId());
             processSingleKO(ctx, attackCtx, pokemon, owner, prizeRecipient);
+        }
+
+        // Take prizes immediately instead of relying on frontend TAKE_PRIZE_CARD
+        if (state.getPendingPrizeOwnerPlayerId() != null && state.getPendingPrizeCount() > 0) {
+            PlayerState prizePlayer = ctx.getPlayer(state.getPendingPrizeOwnerPlayerId());
+            TakePrizeCardHandler.takePrizeImmediate(ctx, prizePlayer, state.getPendingPrizeCount());
+            state.setPendingPrizeOwnerPlayerId(null);
+            state.setPendingPrizeCount(0);
         }
 
         return proceed(ctx, attackCtx);

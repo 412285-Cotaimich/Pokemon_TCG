@@ -65,6 +65,8 @@ class StatusEffectManagerTest {
         PlayerState p2 = new PlayerState();
         p2.setPlayerId(UUID.randomUUID());
         p2.setDiscard(new ArrayList<>());
+        p2.setPrizes(new ArrayList<>());
+        p1.setPrizes(new ArrayList<>());
         state.setPlayers(new PlayerState[]{p1, p2});
         return state;
     }
@@ -337,6 +339,7 @@ class StatusEffectManagerTest {
         def.setHp(100);
         List<GameEvent> events = new ArrayList<>();
         when(ctx.getEnergyService()).thenReturn(energyService);
+        when(ctx.getState()).thenReturn(state);
         when(cardLookup.getCardById("pkm-1")).thenReturn(def);
 
         StatusEffectManager.checkKoBetweenTurns(pkm, cardLookup, state, owner, events, ctx);

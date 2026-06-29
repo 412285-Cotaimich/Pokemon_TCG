@@ -27,6 +27,7 @@ import ar.edu.utn.frc.tup.piii.engine.attack.steps.PrerequisiteStep;
 import ar.edu.utn.frc.tup.piii.engine.attack.steps.TargetSelectionStep;
 import ar.edu.utn.frc.tup.piii.engine.event.GameEvent;
 import ar.edu.utn.frc.tup.piii.engine.event.GameEventType;
+import ar.edu.utn.frc.tup.piii.engine.handlers.TakePrizeCardHandler;
 import ar.edu.utn.frc.tup.piii.engine.model.CardInstance;
 import ar.edu.utn.frc.tup.piii.engine.model.PlayerState;
 import ar.edu.utn.frc.tup.piii.engine.model.PokemonInPlay;
@@ -324,6 +325,7 @@ public class DeclareAttackHandler implements GameHandler {
         if (attackCtx.isConfusedSelfHit()) {
             handleConfusionSelfHit(ctx, player, attacker, opponent);
             state.getTurnFlags().setHasAttacked(true);
+            if (state.getStatus() == MatchStatus.FINISHED) return;
             if (state.isPendingKOReplacement()) {
                 turnManager.endTurn(ctx);
                 turnManager.startTurn(ctx);
@@ -379,13 +381,13 @@ public class DeclareAttackHandler implements GameHandler {
                 Map.of("attackIndex", attackIndex, "attackName", attackName != null ? attackName : "")
         ));
 
+        if (state.getStatus() == MatchStatus.FINISHED) return;
+
         if (state.isPendingKOReplacement()) {
             turnManager.endTurn(ctx);
             turnManager.startTurn(ctx);
             return;
         }
-
-        if (state.getStatus() == MatchStatus.FINISHED) return;
 
         turnManager.endTurn(ctx);
         turnManager.startTurn(ctx);
@@ -464,7 +466,11 @@ public class DeclareAttackHandler implements GameHandler {
         CardDefinition cardDef = ctx.getCardLookup().getCardById(attacker.getCardDefinitionId());
         if (cardDef instanceof PokemonCardDefinition pokemonDef) {
             state.setPendingPrizeOwnerPlayerId(opponent.getPlayerId());
-            state.setPendingPrizeCount(pokemonDef.isEx() ? 2 : 1);
+            int prizeValue = pokemonDef.isEx() ? 2 : 1;
+            state.setPendingPrizeCount(prizeValue);
+            TakePrizeCardHandler.takePrizeImmediate(ctx, opponent, prizeValue);
+            state.setPendingPrizeOwnerPlayerId(null);
+            state.setPendingPrizeCount(0);
         }
 
         if (player.getActivePokemon() != null
